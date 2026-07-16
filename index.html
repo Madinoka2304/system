@@ -22,7 +22,7 @@
   header.top p{color:var(--muted);font-size:12px;margin:0 auto;max-width:440px;letter-spacing:.02em;text-transform:uppercase;}
 
   .auth-bar{display:flex;justify-content:center;margin-top:16px;}
-  .auth-btn{border:1px solid var(--line);background:#fff;color:var(--muted);padding:8px 16px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.02em;display:inline-flex;align-items:center;gap:7px;}
+  .auth-btn{border:1px solid var(--line);background:#fff;color:var(--muted);padding:12px 20px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;letter-spacing:.02em;display:inline-flex;align-items:center;gap:7px;min-height:44px;}
   .auth-btn.unlocked{border-color:var(--accent);color:var(--accent-deep);background:var(--accent-soft);}
   .auth-dot{width:6px;height:6px;border-radius:50%;background:var(--faint);}
   .auth-btn.unlocked .auth-dot{background:var(--accent);}
@@ -31,7 +31,7 @@
 
   .settings{display:flex;gap:16px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin:20px 0;align-items:center;}
   .settings label{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;letter-spacing:.01em;}
-  .settings input{width:88px;border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-size:13px;font-family:inherit;background:#fff;}
+  .settings input{width:96px;border:1px solid var(--line);border-radius:6px;padding:11px 10px;font-size:15px;font-family:inherit;background:#fff;}
   .settings input:disabled{background:var(--bg);color:var(--faint);}
   .settings input:focus{outline:none;border-color:var(--accent);}
 
@@ -67,16 +67,16 @@
   .shift-cell.locked{cursor:default;}
   .period-end{border-right:1px solid var(--period-line);}
 
-  .cell-input{width:74px;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-size:12.5px;text-align:center;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
+  .cell-input{width:84px;border:1px solid var(--line);border-radius:6px;padding:9px 8px;font-size:14px;text-align:center;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
   .cell-input:disabled{background:var(--bg);color:var(--muted);border-color:var(--line);}
   .cell-input:focus{outline:none;border-color:var(--accent);}
   .cell-input.overridden{border-color:var(--accent);background:var(--accent-soft);}
-  .reset-btn{border:none;background:none;color:var(--faint);cursor:pointer;font-size:11px;padding:2px;margin-left:2px;visibility:hidden;}
+  .reset-btn{border:none;background:none;color:var(--faint);cursor:pointer;font-size:16px;padding:6px;margin-left:2px;visibility:hidden;}
   .cell-wrap{position:relative;display:inline-flex;align-items:center;gap:2px;}
   .cell-wrap:hover .reset-btn.active{visibility:visible;}
   .reset-btn.active{color:var(--accent);}
 
-  .rev-input{width:78px;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-size:12.5px;text-align:right;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
+  .rev-input{width:88px;border:1px solid var(--line);border-radius:6px;padding:9px 8px;font-size:14px;text-align:right;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
   .rev-input:disabled{background:var(--bg);color:var(--muted);}
   .weekend{background:var(--weekend);}
   .readonly{color:var(--muted);}
@@ -100,9 +100,9 @@
   .modal{background:#fff;border-radius:10px;padding:26px 26px 22px;max-width:340px;width:100%;}
   .modal h3{font-family:'Fraunces',serif;font-weight:500;font-size:16px;margin:0 0 6px;}
   .modal p{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
-  .modal input{width:100%;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:14px;}
+  .modal input{width:100%;border:1px solid var(--line);border-radius:8px;padding:14px 14px;font-size:16px;font-family:inherit;margin-bottom:14px;}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
-  .modal-btn{border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+  .modal-btn{border:none;border-radius:8px;padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px;}
   .modal-btn.cancel{background:var(--bg);color:var(--muted);}
   .modal-btn.submit{background:var(--ink);color:#fff;}
 
@@ -110,22 +110,22 @@
   .desktop-only{display:block;}
 
   .emp-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
-  .emp-tab{border:none;background:none;color:var(--muted);padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:.02em;text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .emp-tab{border:none;background:none;color:var(--muted);padding:12px 18px;font-size:13.5px;font-weight:600;cursor:pointer;letter-spacing:.02em;text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px;min-height:44px;}
   .emp-tab.active{color:var(--ink);border-bottom-color:var(--accent);}
 
-  .day-chip-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
-  .day-chip{aspect-ratio:1;border-radius:4px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums;}
+  .day-chip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .day-chip{aspect-ratio:1;border-radius:6px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums;min-height:44px;}
   .day-chip.worked{background:var(--ink);color:#fff;border-color:var(--ink);}
   .day-chip.period-mark{box-shadow:inset 0 0 0 1px var(--period-line);}
 
   .rev-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px;}
   .rev-card-nav{display:flex;gap:8px;}
-  .rev-nav-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);}
+  .rev-nav-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:16px;cursor:pointer;color:var(--ink);}
   .rev-card-date{font-family:'Fraunces',serif;font-size:17px;font-weight:500;text-align:center;}
   .rev-card-weekday{text-align:center;font-size:11.5px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase;}
   .rev-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
   .rev-field label{font-size:11px;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase;}
-  .rev-field input{width:100%;padding:11px 6px;font-size:14px;border:1px solid var(--line);border-radius:6px;font-family:inherit;text-align:center;font-variant-numeric:tabular-nums;}
+  .rev-field input{width:100%;padding:14px 8px;font-size:16px;border:1px solid var(--line);border-radius:8px;font-family:inherit;text-align:center;font-variant-numeric:tabular-nums;}
   .rev-stats-row{display:flex;gap:10px;}
   .rev-stat{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:11px;text-align:center;}
   .rev-stat .l{font-size:10px;color:var(--muted);letter-spacing:.03em;text-transform:uppercase;}
@@ -133,11 +133,21 @@
   .rev-jump{display:flex;justify-content:center;margin-top:12px;}
   .rev-jump select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:12.5px;}
 
+  .gear-btn{border:1px solid var(--line);background:#fff;color:var(--muted);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer;flex:0 0 auto;}
+
   @media (max-width:720px){
     .desktop-only{display:none !important;}
     .mobile-only{display:block;}
     .stats-row{grid-template-columns:1fr 1fr;}
     .stats-row .stat-card:last-child{grid-column:span 2;}
+    .rev-field input{padding:15px 8px;font-size:17px;}
+    .day-chip{font-size:13px;min-height:40px;}
+    .rev-nav-btn{width:42px;height:42px;font-size:17px;}
+    .emp-tab{padding:11px 16px;font-size:13.5px;}
+    .modal-btn{padding:12px 18px;font-size:14px;}
+    .rev-jump select{padding:9px 12px;font-size:13.5px;}
+    .cell-input{width:64px;padding:8px 6px;font-size:13.5px;}
+    .rev-input{width:70px;padding:8px 6px;font-size:13.5px;}
   }
 </style>
 </head>
@@ -152,19 +162,32 @@
 
 <div class="wrap" id="mainContent" style="display:none;">
 
-  <div class="settings">
-    <label>Ставка за смену <input type="number" id="ratePerShift" value="6000" disabled> тг</label>
-    <label>Процент от кассы <input type="number" id="commissionPct" value="2" step="0.1" disabled> %</label>
+  <div class="card mobile-only">
+    <h2>Дневная выручка</h2>
+    <div class="rev-card">
+      <div class="rev-card-nav" style="justify-content:space-between;display:flex;margin-bottom:10px;">
+        <button class="rev-nav-btn" id="revPrev">←</button>
+        <button class="rev-nav-btn" id="revNext">→</button>
+      </div>
+      <div class="rev-card-date" id="revCardDate">—</div>
+      <div class="rev-card-weekday" id="revCardWeekday">—</div>
+      <div class="rev-fields">
+        <div class="rev-field"><label>Бар</label><input type="number" id="revCardBar" inputmode="decimal"></div>
+        <div class="rev-field"><label>Десерты</label><input type="number" id="revCardDesserts" inputmode="decimal"></div>
+      </div>
+      <div class="rev-stats-row">
+        <div class="rev-stat"><div class="l">Сумма</div><div class="v" id="revCardSum">—</div></div>
+        <div class="rev-stat"><div class="l">2% (касса)</div><div class="v" id="revCardKassa">—</div></div>
+      </div>
+      <div class="rev-jump"><select id="revJump"></select></div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>Сотрудники</h2>
-    <p class="card-sub" id="empSub">Список тех, кто попадает в расчёт зарплаты</p>
-    <div class="emp-manage" id="empManage"></div>
-    <div class="emp-add mobile-only desktop-only" id="empAddRow" style="margin-top:12px;display:none;">
-      <input type="text" id="newEmpName" placeholder="Имя сотрудника">
-      <button id="addEmpBtn">Добавить</button>
-    </div>
+  <div class="card desktop-only">
+    <h2>Дневная выручка</h2>
+    <p class="card-sub">Редактируй бар/десерты — сумма и 2% посчитаются сами</p>
+    <div class="scroll-x"><table id="revenueTable"></table></div>
+    <div class="legend"><span><i class="dot weekend"></i> выходной день</span></div>
   </div>
 
   <div class="stats-row">
@@ -174,8 +197,13 @@
   </div>
 
   <div class="card">
-    <h2>Зарплата по периодам</h2>
-    <p class="card-sub">Любую ячейку можно переписать вручную — как формулу в экселе. Наведи и нажми ↺, чтобы вернуть авторасчёт.</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Зарплата по периодам</h2>
+        <p class="card-sub">Любую ячейку можно переписать вручную — как формулу в экселе. Наведи и нажми ↺, чтобы вернуть авторасчёт.</p>
+      </div>
+      <button class="gear-btn" id="settingsBtn" title="Настройки расчёта">⚙</button>
+    </div>
     <div class="scroll-x"><table class="summary-table" id="summaryTable"></table></div>
     <div class="empty-state" id="summaryEmpty" style="display:none;">Добавь сотрудников выше, чтобы увидеть расчёт</div>
   </div>
@@ -195,34 +223,32 @@
     <div class="legend"><span><i class="dot yes"></i> рабочая смена</span></div>
   </div>
 
-  <div class="card desktop-only">
-    <h2>Дневная выручка</h2>
-    <p class="card-sub">Редактируй бар/десерты — сумма и 2% посчитаются сами</p>
-    <div class="scroll-x"><table id="revenueTable"></table></div>
-    <div class="legend"><span><i class="dot weekend"></i> выходной день</span></div>
-  </div>
-
-  <div class="card mobile-only">
-    <h2>Дневная выручка</h2>
-    <div class="rev-card">
-      <div class="rev-card-nav" style="justify-content:space-between;display:flex;margin-bottom:10px;">
-        <button class="rev-nav-btn" id="revPrev">←</button>
-        <button class="rev-nav-btn" id="revNext">→</button>
-      </div>
-      <div class="rev-card-date" id="revCardDate">—</div>
-      <div class="rev-card-weekday" id="revCardWeekday">—</div>
-      <div class="rev-fields">
-        <div class="rev-field"><label>Бар</label><input type="number" id="revCardBar"></div>
-        <div class="rev-field"><label>Десерты</label><input type="number" id="revCardDesserts"></div>
-      </div>
-      <div class="rev-stats-row">
-        <div class="rev-stat"><div class="l">Сумма</div><div class="v" id="revCardSum">—</div></div>
-        <div class="rev-stat"><div class="l">2% (касса)</div><div class="v" id="revCardKassa">—</div></div>
-      </div>
-      <div class="rev-jump"><select id="revJump"></select></div>
+  <div class="card">
+    <h2>Сотрудники</h2>
+    <p class="card-sub" id="empSub">Список тех, кто попадает в расчёт зарплаты</p>
+    <div class="emp-manage" id="empManage"></div>
+    <div class="emp-add mobile-only desktop-only" id="empAddRow" style="margin-top:12px;display:none;">
+      <input type="text" id="newEmpName" placeholder="Имя сотрудника">
+      <button id="addEmpBtn">Добавить</button>
     </div>
   </div>
 
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>Настройки расчёта</h3>
+    <p>Влияют на расчёт зарплаты во всех периодах</p>
+    <label style="display:block;margin-bottom:12px;font-size:12.5px;color:var(--muted);">Ставка за смену
+      <input type="number" id="ratePerShift" value="6000" disabled style="width:100%;margin-top:6px;padding:11px;font-size:15px;border:1px solid var(--line);border-radius:6px;">
+    </label>
+    <label style="display:block;margin-bottom:6px;font-size:12.5px;color:var(--muted);">Процент от кассы
+      <input type="number" id="commissionPct" value="2" step="0.1" disabled style="width:100%;margin-top:6px;padding:11px;font-size:15px;border:1px solid var(--line);border-radius:6px;">
+    </label>
+    <div class="modal-actions">
+      <button class="modal-btn submit" id="settingsClose">Готово</button>
+    </div>
+  </div>
 </div>
 
 <div class="load-note" id="loadNote">Загружаю данные…</div>
@@ -242,7 +268,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXyBHD-bPwU-mwsqwOqjVuqGmQmktNgh_0FrBpyEcjjr7hTTmpL2RKLe88iHR6xvCyaw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIkpzGhLzg2cM6FOfsqxQBR7leQs1d5CrISHUOSzoPWrveE2ojkq2Jz1EmVksb2QXkpw/exec';
 const WEEKDAY_SHORT = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const LOCAL_CODE_KEY = 'barista_access_code';
 
@@ -640,50 +666,14 @@ function wireRevCard(){
 function renderEmpManage(){
   const wrap = document.getElementById('empManage');
   wrap.innerHTML = '';
-  state.employees.forEach((name, idx)=>{
-    if(unlocked){
-      const pill = document.createElement('div');
-      pill.className = 'emp-pill';
-      pill.innerHTML = '<input type="text" value="'+name+'" data-idx="'+idx+'"><button data-idx="'+idx+'">×</button>';
-      wrap.appendChild(pill);
-    }else{
-      const pill = document.createElement('div');
-      pill.className = 'emp-pill';
-      pill.innerHTML = '<span style="padding:2px 4px;">'+name+'</span>';
-      wrap.appendChild(pill);
-    }
+  state.employees.forEach(name=>{
+    const pill = document.createElement('div');
+    pill.className = 'emp-pill';
+    pill.innerHTML = '<span style="padding:2px 4px;">'+name+'</span>';
+    wrap.appendChild(pill);
   });
-  document.getElementById('empAddRow').style.display = unlocked ? 'flex' : 'none';
-
-  if(unlocked){
-    wrap.querySelectorAll('input[data-idx]').forEach(inp=>{
-      inp.addEventListener('change', ()=>{
-        const idx = parseInt(inp.getAttribute('data-idx'),10);
-        const oldName = state.employees[idx];
-        const newName = inp.value.trim();
-        if(!newName) return;
-        state.employees[idx] = newName;
-        if(oldName !== newName){
-          if(state.shifts[oldName]){ state.shifts[newName] = state.shifts[oldName]; delete state.shifts[oldName]; }
-          if(state.overrides[oldName]){ state.overrides[newName] = state.overrides[oldName]; delete state.overrides[oldName]; }
-          if(mobileEmp === oldName) mobileEmp = newName;
-        }
-        renderAll();
-        persist();
-      });
-    });
-    wrap.querySelectorAll('button[data-idx]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const idx = parseInt(btn.getAttribute('data-idx'),10);
-        const name = state.employees[idx];
-        if(!confirm('Удалить '+name+' из списка? Данные по сменам сохранятся, но перестанут отображаться.')) return;
-        state.employees.splice(idx,1);
-        if(mobileEmp === name) mobileEmp = state.employees[0] || null;
-        renderAll();
-        persist();
-      });
-    });
-  }
+  document.getElementById('empAddRow').style.display = 'none';
+  document.getElementById('empSub').textContent = 'Список задан в самой таблице — на сайте только для просмотра';
 }
 
 function wireEmpAdd(){
@@ -715,6 +705,11 @@ function wireSettings(){
     state.settings.commissionPct = parseFloat(pct.value) || 0;
     renderAll(); persist();
   });
+
+  const modal = document.getElementById('settingsModal');
+  document.getElementById('settingsBtn').addEventListener('click', ()=> modal.classList.add('active'));
+  document.getElementById('settingsClose').addEventListener('click', ()=> modal.classList.remove('active'));
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) modal.classList.remove('active'); });
 }
 
 function renderAll(){
