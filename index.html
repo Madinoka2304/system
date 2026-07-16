@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Зарплата бариста — интерактивно</title>
+<title>Зарплата бариста</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -11,21 +11,39 @@
     --bg:#f6f4f1; --card:#ffffff; --ink:#17140f; --muted:#726a5d; --faint:#a89f8f;
     --line:#e2ddd3; --accent:#8a6a35; --accent-soft:#f0ebe0; --accent-deep:#5c4620;
     --good:#5c6b52; --weekend:#f1efe9; --period-line:#cfc7b6; --danger:#8a3f30;
-    --shadow: none;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:'Manrope',sans-serif;line-height:1.55;padding:0 0 100px;-webkit-font-smoothing:antialiased;}
   .wrap{max-width:1100px;margin:0 auto;padding:0 18px;}
   a{color:inherit;}
 
-  header.top{padding:44px 18px 30px;text-align:center;border-bottom:1px solid var(--line);}
+  header.top{padding:36px 18px 24px;text-align:center;border-bottom:1px solid var(--line);position:relative;}
   header.top h1{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(21px,3.6vw,27px);margin:0 0 8px;letter-spacing:.01em;}
-  header.top p{color:var(--muted);font-size:12.5px;margin:0 auto;max-width:440px;letter-spacing:.02em;text-transform:uppercase;}
+  header.top p{color:var(--muted);font-size:12px;margin:0 auto;max-width:440px;letter-spacing:.02em;text-transform:uppercase;}
+
+  .auth-bar{display:flex;justify-content:center;margin-top:16px;}
+  .auth-btn{border:1px solid var(--line);background:#fff;color:var(--muted);padding:8px 16px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.02em;display:inline-flex;align-items:center;gap:7px;}
+  .auth-btn.unlocked{border-color:var(--accent);color:var(--accent-deep);background:var(--accent-soft);}
+  .auth-dot{width:6px;height:6px;border-radius:50%;background:var(--faint);}
+  .auth-btn.unlocked .auth-dot{background:var(--accent);}
+
+  .load-note{text-align:center;color:var(--muted);font-size:12.5px;padding:40px 20px;}
 
   .settings{display:flex;gap:16px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin:20px 0;align-items:center;}
   .settings label{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;letter-spacing:.01em;}
   .settings input{width:88px;border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-size:13px;font-family:inherit;background:#fff;}
+  .settings input:disabled{background:var(--bg);color:var(--faint);}
   .settings input:focus{outline:none;border-color:var(--accent);}
+
+  .emp-manage{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+  .emp-pill{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 14px;font-size:12.5px;background:#fff;}
+  .emp-pill input{border:none;font-size:12.5px;font-family:inherit;width:90px;background:transparent;}
+  .emp-pill input:focus{outline:none;}
+  .emp-pill button{border:none;background:var(--bg);color:var(--muted);border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;line-height:1;}
+  .emp-add{display:flex;gap:8px;align-items:center;}
+  .emp-add input{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:12.5px;font-family:inherit;width:130px;}
+  .emp-add button{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .empty-state{color:var(--muted);font-size:13px;text-align:center;padding:30px 0;}
 
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
   .stat-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;}
@@ -46,18 +64,20 @@
   .shift-cell:hover{background:#f0ede4;}
   .shift-yes{background:transparent;}
   .shift-yes::after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+  .shift-cell.locked{cursor:default;}
   .period-end{border-right:1px solid var(--period-line);}
 
   .cell-input{width:74px;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-size:12.5px;text-align:center;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
+  .cell-input:disabled{background:var(--bg);color:var(--muted);border-color:var(--line);}
   .cell-input:focus{outline:none;border-color:var(--accent);}
   .cell-input.overridden{border-color:var(--accent);background:var(--accent-soft);}
-  .cell-unit{font-size:10px;color:var(--faint);display:block;margin-top:1px;}
   .reset-btn{border:none;background:none;color:var(--faint);cursor:pointer;font-size:11px;padding:2px;margin-left:2px;visibility:hidden;}
   .cell-wrap{position:relative;display:inline-flex;align-items:center;gap:2px;}
   .cell-wrap:hover .reset-btn.active{visibility:visible;}
   .reset-btn.active{color:var(--accent);}
 
   .rev-input{width:78px;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-size:12.5px;text-align:right;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
+  .rev-input:disabled{background:var(--bg);color:var(--muted);}
   .weekend{background:var(--weekend);}
   .readonly{color:var(--muted);}
 
@@ -70,17 +90,26 @@
   .dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
   .dot.yes{background:var(--accent);}
   .dot.weekend{background:var(--faint);}
-  .dot.override{background:var(--accent);}
 
   .saved{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:12px;padding:9px 18px;border-radius:6px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:50;letter-spacing:.01em;}
   .saved.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .saved.error{background:var(--danger);}
 
-  /* ---- mobile-only components ---- */
+  .modal-overlay{position:fixed;inset:0;background:rgba(20,16,10,.4);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .modal-overlay.active{opacity:1;pointer-events:auto;}
+  .modal{background:#fff;border-radius:10px;padding:26px 26px 22px;max-width:340px;width:100%;}
+  .modal h3{font-family:'Fraunces',serif;font-weight:500;font-size:16px;margin:0 0 6px;}
+  .modal p{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+  .modal input{width:100%;border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:14px;font-family:inherit;margin-bottom:14px;}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .modal-btn{border:none;border-radius:6px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+  .modal-btn.cancel{background:var(--bg);color:var(--muted);}
+  .modal-btn.submit{background:var(--ink);color:#fff;}
+
   .mobile-only{display:none;}
   .desktop-only{display:block;}
 
-  .emp-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--line);}
+  .emp-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
   .emp-tab{border:none;background:none;color:var(--muted);padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:.02em;text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px;}
   .emp-tab.active{color:var(--ink);border-bottom-color:var(--accent);}
 
@@ -90,7 +119,6 @@
   .day-chip.period-mark{box-shadow:inset 0 0 0 1px var(--period-line);}
 
   .rev-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px;}
-  .rev-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .rev-card-nav{display:flex;gap:8px;}
   .rev-nav-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);}
   .rev-card-date{font-family:'Fraunces',serif;font-size:17px;font-weight:500;text-align:center;}
@@ -116,36 +144,46 @@
 <body>
 <header class="top">
   <h1>Зарплата бариста</h1>
-  <p>30 июня — 31 июля · тыкай, пиши числа, всё считается и сохраняется само</p>
+  <p>30 июня — 31 июля</p>
+  <div class="auth-bar">
+    <button class="auth-btn" id="authBtn"><span class="auth-dot"></span><span id="authBtnText">Войти как старший бариста</span></button>
+  </div>
 </header>
 
-<div class="wrap">
+<div class="wrap" id="mainContent" style="display:none;">
 
   <div class="settings">
-    <label>Ставка за смену <input type="number" id="ratePerShift" value="6000"> тг</label>
-    <label>Процент от кассы <input type="number" id="commissionPct" value="2" step="0.1"> %</label>
+    <label>Ставка за смену <input type="number" id="ratePerShift" value="6000" disabled> тг</label>
+    <label>Процент от кассы <input type="number" id="commissionPct" value="2" step="0.1" disabled> %</label>
+  </div>
+
+  <div class="card">
+    <h2>Сотрудники</h2>
+    <p class="card-sub" id="empSub">Список тех, кто попадает в расчёт зарплаты</p>
+    <div class="emp-manage" id="empManage"></div>
+    <div class="emp-add mobile-only desktop-only" id="empAddRow" style="margin-top:12px;display:none;">
+      <input type="text" id="newEmpName" placeholder="Имя сотрудника">
+      <button id="addEmpBtn">Добавить</button>
+    </div>
   </div>
 
   <div class="stats-row">
     <div class="stat-card"><div class="label">Итого начислено</div><div class="value" id="grandTotal">—</div></div>
-    <div class="stat-card"><div class="label">Сотрудников</div><div class="value">4</div></div>
+    <div class="stat-card"><div class="label">Сотрудников</div><div class="value" id="empCount">—</div></div>
     <div class="stat-card"><div class="label">Смен всего</div><div class="value" id="totalShifts">—</div></div>
   </div>
 
   <div class="card">
     <h2>Зарплата по периодам</h2>
     <p class="card-sub">Любую ячейку можно переписать вручную — как формулу в экселе. Наведи и нажми ↺, чтобы вернуть авторасчёт.</p>
-    <div class="scroll-x">
-      <table class="summary-table" id="summaryTable"></table>
-    </div>
+    <div class="scroll-x"><table class="summary-table" id="summaryTable"></table></div>
+    <div class="empty-state" id="summaryEmpty" style="display:none;">Добавь сотрудников выше, чтобы увидеть расчёт</div>
   </div>
 
   <div class="card desktop-only">
     <h2>График смен</h2>
     <p class="card-sub">Клик по клетке переключает смену</p>
-    <div class="scroll-x">
-      <table id="shiftTable"></table>
-    </div>
+    <div class="scroll-x"><table id="shiftTable"></table></div>
     <div class="legend"><span><i class="dot yes"></i> рабочая смена</span></div>
   </div>
 
@@ -160,9 +198,7 @@
   <div class="card desktop-only">
     <h2>Дневная выручка</h2>
     <p class="card-sub">Редактируй бар/десерты — сумма и 2% посчитаются сами</p>
-    <div class="scroll-x">
-      <table id="revenueTable"></table>
-    </div>
+    <div class="scroll-x"><table id="revenueTable"></table></div>
     <div class="legend"><span><i class="dot weekend"></i> выходной день</span></div>
   </div>
 
@@ -188,14 +224,27 @@
   </div>
 
 </div>
+
+<div class="load-note" id="loadNote">Загружаю данные…</div>
+
 <div class="saved" id="savedToast">Сохранено</div>
 
+<div class="modal-overlay" id="codeModal">
+  <div class="modal">
+    <h3>Вход для старшего бариста</h3>
+    <p>Код нужен только на этом устройстве один раз — дальше он запомнится в браузере.</p>
+    <input type="password" id="codeInput" placeholder="Код доступа">
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="codeCancel">Отмена</button>
+      <button class="modal-btn submit" id="codeSubmit">Войти</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const SEED = {"shifts": {"\u0415\u0440\u0430\u0441\u044b\u043b": {"2026-06-30": false, "2026-07-01": false, "2026-07-02": true, "2026-07-03": true, "2026-07-04": false, "2026-07-05": false, "2026-07-06": true, "2026-07-07": true, "2026-07-08": false, "2026-07-09": false, "2026-07-10": true, "2026-07-11": true, "2026-07-12": false, "2026-07-13": false, "2026-07-14": false, "2026-07-15": true, "2026-07-16": false, "2026-07-17": false, "2026-07-18": true, "2026-07-19": true, "2026-07-20": false, "2026-07-21": false, "2026-07-22": true, "2026-07-23": true, "2026-07-24": true, "2026-07-25": false, "2026-07-26": false, "2026-07-27": true, "2026-07-28": true, "2026-07-29": false, "2026-07-30": false}, "\u0411\u0435\u043a\u0430": {"2026-06-30": true, "2026-07-01": true, "2026-07-02": false, "2026-07-03": false, "2026-07-04": true, "2026-07-05": true, "2026-07-06": false, "2026-07-07": false, "2026-07-08": true, "2026-07-09": true, "2026-07-10": false, "2026-07-11": false, "2026-07-12": true, "2026-07-13": true, "2026-07-14": true, "2026-07-15": false, "2026-07-16": true, "2026-07-17": true, "2026-07-18": false, "2026-07-19": false, "2026-07-20": true, "2026-07-21": true, "2026-07-22": false, "2026-07-23": false, "2026-07-24": false, "2026-07-25": true, "2026-07-26": true, "2026-07-27": false, "2026-07-28": false, "2026-07-29": true, "2026-07-30": true}, "\u0414\u0430\u043c\u0438\u0440": {"2026-06-30": false, "2026-07-01": false, "2026-07-02": true, "2026-07-03": false, "2026-07-04": false, "2026-07-05": false, "2026-07-06": true, "2026-07-07": false, "2026-07-08": false, "2026-07-09": false, "2026-07-10": true, "2026-07-11": true, "2026-07-12": false, "2026-07-13": false, "2026-07-14": true, "2026-07-15": true, "2026-07-16": false, "2026-07-17": false, "2026-07-18": true, "2026-07-19": true, "2026-07-20": false, "2026-07-21": true, "2026-07-22": true, "2026-07-23": false, "2026-07-24": false, "2026-07-25": false, "2026-07-26": false, "2026-07-27": false, "2026-07-28": true, "2026-07-29": true, "2026-07-30": false}, "\u041a\u0435\u043c\u0430\u043b": {"2026-06-30": true, "2026-07-01": true, "2026-07-02": false, "2026-07-03": true, "2026-07-04": true, "2026-07-05": true, "2026-07-06": false, "2026-07-07": true, "2026-07-08": true, "2026-07-09": true, "2026-07-10": false, "2026-07-11": false, "2026-07-12": true, "2026-07-13": true, "2026-07-14": false, "2026-07-15": false, "2026-07-16": true, "2026-07-17": true, "2026-07-18": false, "2026-07-19": false, "2026-07-20": true, "2026-07-21": false, "2026-07-22": false, "2026-07-23": true, "2026-07-24": true, "2026-07-25": true, "2026-07-26": true, "2026-07-27": true, "2026-07-28": false, "2026-07-29": false, "2026-07-30": true}}, "revenue": {"2026-06-30": {"bar": 522280.0, "desserts": 98759.0}, "2026-07-01": {"bar": 478292.0, "desserts": 67627.0}, "2026-07-02": {"bar": 406703.0, "desserts": 61577.0}, "2026-07-03": {"bar": 479886.0, "desserts": 71426.0}, "2026-07-04": {"bar": 520028.0, "desserts": 95505.0}, "2026-07-05": {"bar": 518510.0, "desserts": 76611.0}, "2026-07-06": {"bar": 543528.0, "desserts": 95068.0}, "2026-07-07": {"bar": 454379.0, "desserts": 78742.0}, "2026-07-08": {"bar": 484155.0, "desserts": 66925.0}, "2026-07-09": {"bar": 486602.0, "desserts": 61947.0}, "2026-07-10": {"bar": 469938.0, "desserts": 69404.0}, "2026-07-11": {"bar": 600000.0, "desserts": 0.0}, "2026-07-12": {"bar": 0.0, "desserts": 0.0}, "2026-07-13": {"bar": 0.0, "desserts": 0.0}, "2026-07-14": {"bar": 0, "desserts": 0}, "2026-07-15": {"bar": 0.0, "desserts": 0.0}, "2026-07-16": {"bar": 0.0, "desserts": 0.0}, "2026-07-17": {"bar": 0.0, "desserts": 0.0}, "2026-07-18": {"bar": 0.0, "desserts": 0.0}, "2026-07-19": {"bar": 0.0, "desserts": 0.0}, "2026-07-20": {"bar": 0.0, "desserts": 0.0}, "2026-07-21": {"bar": 0.0, "desserts": 0.0}, "2026-07-22": {"bar": 0.0, "desserts": 0.0}, "2026-07-23": {"bar": 0.0, "desserts": 0.0}, "2026-07-24": {"bar": 0.0, "desserts": 0.0}, "2026-07-25": {"bar": 0.0, "desserts": 0.0}, "2026-07-26": {"bar": 0.0, "desserts": 0.0}, "2026-07-27": {"bar": 0.0, "desserts": 0.0}, "2026-07-28": {"bar": 0.0, "desserts": 0.0}, "2026-07-29": {"bar": 0.0, "desserts": 0.0}, "2026-07-30": {"bar": 0.0, "desserts": 0.0}, "2026-07-31": {"bar": 0.0, "desserts": 0.0}}}
-;
-const EMPLOYEES = ['Ерасыл','Бека','Дамир','Кемал'];
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBW3dML1Q3QuH7G-jnXxhvTq4TpxLtakborldMbWVafHfc6wCPsdJ6EZZ6_uczX6idnw/exec';
 const WEEKDAY_SHORT = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-const STORAGE_KEY = 'payroll-data';
+const LOCAL_CODE_KEY = 'barista_access_code';
 
 function buildDates(){
   const dates = [];
@@ -219,29 +268,28 @@ function periodOf(dateStr){
   return 2;
 }
 
-let state = {
-  shifts: {}, revenue: {},
-  settings: {ratePerShift:6000, commissionPct:2},
-  overrides: {}
-};
-let mobileEmp = EMPLOYEES[0];
+let state = { employees: [], shifts: {}, revenue: {}, settings: {ratePerShift:6000, commissionPct:2}, overrides: {} };
+let unlocked = false;
+let myCode = null;
+let mobileEmp = null;
 let mobileRevIndex = ALL_DATES.indexOf('2026-07-16');
 if(mobileRevIndex < 0) mobileRevIndex = 0;
 
 async function loadState(){
   try{
-    const res = await window.storage.get(STORAGE_KEY);
-    if(res && res.value){
-      const parsed = JSON.parse(res.value);
-      state.shifts = parsed.shifts || SEED.shifts;
-      state.revenue = parsed.revenue || SEED.revenue;
-      state.settings = parsed.settings || state.settings;
-      state.overrides = parsed.overrides || {};
-      return;
-    }
-  }catch(e){ /* first run or read error, fall back to seed */ }
-  state.shifts = SEED.shifts;
-  state.revenue = SEED.revenue;
+    const res = await fetch(APPS_SCRIPT_URL, {method:'GET'});
+    const json = await res.json();
+    state.employees = json.employees || [];
+    state.shifts = json.shifts || {};
+    state.revenue = json.revenue || {};
+    state.settings = json.settings || {ratePerShift:6000, commissionPct:2};
+    state.overrides = json.overrides || {};
+  }catch(e){
+    console.error('load failed', e);
+    document.getElementById('loadNote').textContent = 'Не получилось загрузить данные — проверь ссылку на скрипт и подключение к интернету.';
+    return false;
+  }
+  return true;
 }
 
 let saveTimer = null;
@@ -252,14 +300,25 @@ function showToast(msg, isError){
   t.classList.toggle('error', !!isError);
   t.classList.add('show');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(()=> t.classList.remove('show'), isError ? 2200 : 1000);
+  saveTimer = setTimeout(()=> t.classList.remove('show'), isError ? 2400 : 1000);
 }
+
 async function persistNow(){
+  if(!unlocked || !myCode) return;
   try{
-    await window.storage.set(STORAGE_KEY, JSON.stringify({
-      shifts: state.shifts, revenue: state.revenue,
+    const body = new URLSearchParams();
+    body.set('code', myCode);
+    body.set('data', JSON.stringify({
+      employees: state.employees, shifts: state.shifts, revenue: state.revenue,
       settings: state.settings, overrides: state.overrides
     }));
+    const res = await fetch(APPS_SCRIPT_URL, {method:'POST', body});
+    const json = await res.json();
+    if(json.error){
+      showToast('Неверный код — вход сброшен', true);
+      lock();
+      return;
+    }
     showToast('Сохранено', false);
   }catch(e){
     console.error('save failed', e);
@@ -286,7 +345,6 @@ function kassaDnya(dateStr){
   return total * (state.settings.commissionPct/100);
 }
 
-// auto (calendar-derived) values, always fresh, ignoring overrides
 function autoPeriods(emp){
   const periods = [ {shifts:0, pay:0}, {shifts:0, pay:0}, {shifts:0, pay:0} ];
   SHIFT_DATES.forEach(dateStr=>{
@@ -304,8 +362,6 @@ function ov(emp){
   if(!state.overrides[emp]) state.overrides[emp] = {};
   return state.overrides[emp];
 }
-
-// field keys: s0,p0,s1,p1,s2,p2 (shifts/pay per period), stot,ptot
 function displayValue(emp, field, autoP){
   const o = ov(emp);
   if(o[field] !== undefined && o[field] !== null) return o[field];
@@ -317,7 +373,6 @@ function isOverridden(emp, field){
   const o = ov(emp);
   return o[field] !== undefined && o[field] !== null;
 }
-
 function totalsFor(emp, autoP){
   const s0=displayValue(emp,'s0',autoP), s1=displayValue(emp,'s1',autoP), s2=displayValue(emp,'s2',autoP);
   const p0=displayValue(emp,'p0',autoP), p1=displayValue(emp,'p1',autoP), p2=displayValue(emp,'p2',autoP);
@@ -327,20 +382,31 @@ function totalsFor(emp, autoP){
   return {stot, ptot};
 }
 
-function makeCellHTML(emp, field, value, unit){
+function makeCellHTML(emp, field, value){
   const overridden = isOverridden(emp, field);
+  const dis = unlocked ? '' : 'disabled';
   return '<span class="cell-wrap">' +
-    '<input class="cell-input'+(overridden?' overridden':'')+'" type="number" data-emp="'+emp+'" data-field="'+field+'" value="'+value+'">' +
-    '<button class="reset-btn'+(overridden?' active':'')+'" data-emp="'+emp+'" data-field="'+field+'" title="Вернуть автоматический расчёт">↺</button>' +
+    '<input class="cell-input'+(overridden?' overridden':'')+'" type="number" '+dis+' data-emp="'+emp+'" data-field="'+field+'" value="'+value+'">' +
+    (unlocked ? '<button class="reset-btn'+(overridden?' active':'')+'" data-emp="'+emp+'" data-field="'+field+'" title="Вернуть автоматический расчёт">↺</button>' : '') +
     '</span>';
 }
 
 function renderSummary(){
   const table = document.getElementById('summaryTable');
+  const emptyMsg = document.getElementById('summaryEmpty');
+  if(state.employees.length === 0){
+    table.innerHTML = '';
+    emptyMsg.style.display = 'block';
+    document.getElementById('grandTotal').textContent = fmtMoney(0);
+    document.getElementById('totalShifts').textContent = 0;
+    document.getElementById('empCount').textContent = 0;
+    return;
+  }
+  emptyMsg.style.display = 'none';
   let thead = '<thead><tr><th>Сотрудник</th><th>Смены 30-9</th><th>ЗП 30-9</th><th>Смены 10-19</th><th>ЗП 10-19</th><th>Смены 20-31</th><th>ЗП 20-31</th><th>Итого смен</th><th>Итого ЗП</th></tr></thead>';
   let tbody = '<tbody>';
   let grandTotal = 0, totalShiftsAll = 0;
-  EMPLOYEES.forEach(emp=>{
+  state.employees.forEach(emp=>{
     const autoP = autoPeriods(emp);
     const s0=displayValue(emp,'s0',autoP), p0=displayValue(emp,'p0',autoP);
     const s1=displayValue(emp,'s1',autoP), p1=displayValue(emp,'p1',autoP);
@@ -363,6 +429,7 @@ function renderSummary(){
   table.innerHTML = thead + tbody;
   document.getElementById('grandTotal').textContent = fmtMoney(grandTotal);
   document.getElementById('totalShifts').textContent = totalShiftsAll;
+  document.getElementById('empCount').textContent = state.employees.length;
 
   table.querySelectorAll('.cell-input').forEach(inp=>{
     inp.addEventListener('change', ()=>{
@@ -399,14 +466,15 @@ function isWeekend(dateStr){
   const d = new Date(dateStr+'T00:00:00');
   return d.getDay()===0 || d.getDay()===6;
 }
-
 function toggleShift(emp, dateStr){
+  if(!unlocked) return;
   if(!state.shifts[emp]) state.shifts[emp] = {};
   state.shifts[emp][dateStr] = !state.shifts[emp][dateStr];
 }
 
 function renderShiftTableDesktop(){
   const table = document.getElementById('shiftTable');
+  if(state.employees.length === 0){ table.innerHTML = ''; return; }
   let thead = '<thead><tr><th class="emp-name">Сотрудник</th>';
   SHIFT_DATES.forEach((dateStr,i)=>{
     const nextDate = SHIFT_DATES[i+1] || '9999-99-99';
@@ -415,35 +483,39 @@ function renderShiftTableDesktop(){
   });
   thead += '</tr></thead>';
   let tbody = '<tbody>';
-  EMPLOYEES.forEach(emp=>{
+  state.employees.forEach(emp=>{
     tbody += '<tr><td class="emp-name">'+emp+'</td>';
     SHIFT_DATES.forEach((dateStr,i)=>{
       const worked = !!(state.shifts[emp] && state.shifts[emp][dateStr]);
       const nextDate = SHIFT_DATES[i+1] || '9999-99-99';
       const periodEnd = periodOf(dateStr) !== periodOf(nextDate);
-      tbody += '<td class="shift-cell '+(worked?'shift-yes':'')+(periodEnd?' period-end':'')+'" data-emp="'+emp+'" data-date="'+dateStr+'"></td>';
+      const lockCls = unlocked ? '' : ' locked';
+      tbody += '<td class="shift-cell'+lockCls+' '+(worked?'shift-yes':'')+(periodEnd?' period-end':'')+'" data-emp="'+emp+'" data-date="'+dateStr+'"></td>';
     });
     tbody += '</tr>';
   });
   tbody += '</tbody>';
   table.innerHTML = thead + tbody;
 
-  table.querySelectorAll('.shift-cell').forEach(cell=>{
-    cell.addEventListener('click', ()=>{
-      const emp = cell.getAttribute('data-emp');
-      const dateStr = cell.getAttribute('data-date');
-      toggleShift(emp, dateStr);
-      cell.classList.toggle('shift-yes');
-      renderSummary();
-      persist();
+  if(unlocked){
+    table.querySelectorAll('.shift-cell').forEach(cell=>{
+      cell.addEventListener('click', ()=>{
+        const emp = cell.getAttribute('data-emp');
+        const dateStr = cell.getAttribute('data-date');
+        toggleShift(emp, dateStr);
+        cell.classList.toggle('shift-yes');
+        renderSummary();
+        persist();
+      });
     });
-  });
+  }
 }
 
 function renderEmpTabs(){
   const wrap = document.getElementById('empTabs');
   wrap.innerHTML = '';
-  EMPLOYEES.forEach(emp=>{
+  if(!mobileEmp && state.employees.length) mobileEmp = state.employees[0];
+  state.employees.forEach(emp=>{
     const btn = document.createElement('button');
     btn.className = 'emp-tab' + (emp===mobileEmp ? ' active' : '');
     btn.textContent = emp;
@@ -455,18 +527,21 @@ function renderEmpTabs(){
 function renderDayChips(){
   const grid = document.getElementById('dayChipGrid');
   grid.innerHTML = '';
+  if(!mobileEmp) return;
   SHIFT_DATES.forEach((dateStr,i)=>{
     const worked = !!(state.shifts[mobileEmp] && state.shifts[mobileEmp][dateStr]);
     const nextDate = SHIFT_DATES[i+1] || '9999-99-99';
     const chip = document.createElement('div');
     chip.className = 'day-chip' + (worked ? ' worked' : '') + (periodOf(dateStr)!==periodOf(nextDate) ? ' period-mark' : '');
     chip.textContent = dayLabel(dateStr).replace('30/06','30.6');
-    chip.addEventListener('click', ()=>{
-      toggleShift(mobileEmp, dateStr);
-      chip.classList.toggle('worked');
-      renderSummary();
-      persist();
-    });
+    if(unlocked){
+      chip.addEventListener('click', ()=>{
+        toggleShift(mobileEmp, dateStr);
+        chip.classList.toggle('worked');
+        renderSummary();
+        persist();
+      });
+    }
     grid.appendChild(chip);
   });
 }
@@ -479,11 +554,12 @@ function renderRevenueTableDesktop(){
     const total = (rev.bar||0)+(rev.desserts||0);
     const kd = total * (state.settings.commissionPct/100);
     const wcls = isWeekend(dateStr) ? ' class="weekend"' : '';
+    const dis = unlocked ? '' : 'disabled';
     html += '<tr'+wcls+'>' +
       '<td>'+dayLabel(dateStr)+'</td>' +
       '<td>'+weekdayOf(dateStr)+'</td>' +
-      '<td><input class="rev-input" type="number" data-date="'+dateStr+'" data-field="bar" value="'+(rev.bar||0)+'"></td>' +
-      '<td><input class="rev-input" type="number" data-date="'+dateStr+'" data-field="desserts" value="'+(rev.desserts||0)+'"></td>' +
+      '<td><input class="rev-input" type="number" '+dis+' data-date="'+dateStr+'" data-field="bar" value="'+(rev.bar||0)+'"></td>' +
+      '<td><input class="rev-input" type="number" '+dis+' data-date="'+dateStr+'" data-field="desserts" value="'+(rev.desserts||0)+'"></td>' +
       '<td class="readonly">'+fmtNum(total)+'</td>' +
       '<td class="readonly">'+fmtMoney(kd)+'</td>' +
       '</tr>';
@@ -491,18 +567,20 @@ function renderRevenueTableDesktop(){
   html += '</tbody>';
   table.innerHTML = html;
 
-  table.querySelectorAll('.rev-input').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      const dateStr = inp.getAttribute('data-date');
-      const field = inp.getAttribute('data-field');
-      if(!state.revenue[dateStr]) state.revenue[dateStr] = {bar:0, desserts:0};
-      state.revenue[dateStr][field] = parseFloat(inp.value) || 0;
-      renderRevenueTableDesktop();
-      renderRevCard();
-      renderSummary();
-      persist();
+  if(unlocked){
+    table.querySelectorAll('.rev-input').forEach(inp=>{
+      inp.addEventListener('change', ()=>{
+        const dateStr = inp.getAttribute('data-date');
+        const field = inp.getAttribute('data-field');
+        if(!state.revenue[dateStr]) state.revenue[dateStr] = {bar:0, desserts:0};
+        state.revenue[dateStr][field] = parseFloat(inp.value) || 0;
+        renderRevenueTableDesktop();
+        renderRevCard();
+        renderSummary();
+        persist();
+      });
     });
-  });
+  }
 }
 
 function renderRevJumpOptions(){
@@ -517,10 +595,13 @@ function renderRevCard(){
   const rev = state.revenue[dateStr] || {bar:0, desserts:0};
   const total = (rev.bar||0)+(rev.desserts||0);
   const kd = total * (state.settings.commissionPct/100);
-  document.getElementById('revCardDate').textContent = dayLabel(dateStr) + (dateStr.slice(5,7)==='07' && dateStr!=='2026-07-31' ? ' июля' : dateStr==='2026-07-31' ? ' июля' : ' июня');
+  const monthLabel = dateStr.slice(5,7)==='06' ? ' июня' : ' июля';
+  document.getElementById('revCardDate').textContent = dayLabel(dateStr).replace('30/06','30') + monthLabel;
   document.getElementById('revCardWeekday').textContent = weekdayOf(dateStr) + (isWeekend(dateStr) ? ' · выходной' : '');
   document.getElementById('revCardBar').value = rev.bar || 0;
   document.getElementById('revCardDesserts').value = rev.desserts || 0;
+  document.getElementById('revCardBar').disabled = !unlocked;
+  document.getElementById('revCardDesserts').disabled = !unlocked;
   document.getElementById('revCardSum').textContent = fmtNum(total);
   document.getElementById('revCardKassa').textContent = fmtMoney(kd);
   const sel = document.getElementById('revJump');
@@ -538,6 +619,7 @@ function wireRevCard(){
   });
   ['revCardBar','revCardDesserts'].forEach(id=>{
     document.getElementById(id).addEventListener('change', ()=>{
+      if(!unlocked) return;
       const dateStr = ALL_DATES[mobileRevIndex];
       if(!state.revenue[dateStr]) state.revenue[dateStr] = {bar:0, desserts:0};
       const field = id==='revCardBar' ? 'bar' : 'desserts';
@@ -550,6 +632,71 @@ function wireRevCard(){
   });
 }
 
+function renderEmpManage(){
+  const wrap = document.getElementById('empManage');
+  wrap.innerHTML = '';
+  state.employees.forEach((name, idx)=>{
+    if(unlocked){
+      const pill = document.createElement('div');
+      pill.className = 'emp-pill';
+      pill.innerHTML = '<input type="text" value="'+name+'" data-idx="'+idx+'"><button data-idx="'+idx+'">×</button>';
+      wrap.appendChild(pill);
+    }else{
+      const pill = document.createElement('div');
+      pill.className = 'emp-pill';
+      pill.innerHTML = '<span style="padding:2px 4px;">'+name+'</span>';
+      wrap.appendChild(pill);
+    }
+  });
+  document.getElementById('empAddRow').style.display = unlocked ? 'flex' : 'none';
+
+  if(unlocked){
+    wrap.querySelectorAll('input[data-idx]').forEach(inp=>{
+      inp.addEventListener('change', ()=>{
+        const idx = parseInt(inp.getAttribute('data-idx'),10);
+        const oldName = state.employees[idx];
+        const newName = inp.value.trim();
+        if(!newName) return;
+        state.employees[idx] = newName;
+        if(oldName !== newName){
+          if(state.shifts[oldName]){ state.shifts[newName] = state.shifts[oldName]; delete state.shifts[oldName]; }
+          if(state.overrides[oldName]){ state.overrides[newName] = state.overrides[oldName]; delete state.overrides[oldName]; }
+          if(mobileEmp === oldName) mobileEmp = newName;
+        }
+        renderAll();
+        persist();
+      });
+    });
+    wrap.querySelectorAll('button[data-idx]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.getAttribute('data-idx'),10);
+        const name = state.employees[idx];
+        if(!confirm('Удалить '+name+' из списка? Данные по сменам сохранятся, но перестанут отображаться.')) return;
+        state.employees.splice(idx,1);
+        if(mobileEmp === name) mobileEmp = state.employees[0] || null;
+        renderAll();
+        persist();
+      });
+    });
+  }
+}
+
+function wireEmpAdd(){
+  document.getElementById('addEmpBtn').addEventListener('click', ()=>{
+    const inp = document.getElementById('newEmpName');
+    const name = inp.value.trim();
+    if(!name) return;
+    if(state.employees.includes(name)){ inp.value=''; return; }
+    state.employees.push(name);
+    inp.value = '';
+    renderAll();
+    persist();
+  });
+  document.getElementById('newEmpName').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') document.getElementById('addEmpBtn').click();
+  });
+}
+
 function wireSettings(){
   const rate = document.getElementById('ratePerShift');
   const pct = document.getElementById('commissionPct');
@@ -557,17 +704,16 @@ function wireSettings(){
   pct.value = state.settings.commissionPct;
   rate.addEventListener('change', ()=>{
     state.settings.ratePerShift = parseFloat(rate.value) || 0;
-    renderAll();
-    persist();
+    renderAll(); persist();
   });
   pct.addEventListener('change', ()=>{
     state.settings.commissionPct = parseFloat(pct.value) || 0;
-    renderAll();
-    persist();
+    renderAll(); persist();
   });
 }
 
 function renderAll(){
+  renderEmpManage();
   renderSummary();
   renderShiftTableDesktop();
   renderEmpTabs();
@@ -575,12 +721,69 @@ function renderAll(){
   renderRevenueTableDesktop();
   renderRevJumpOptions();
   renderRevCard();
+  document.getElementById('ratePerShift').disabled = !unlocked;
+  document.getElementById('commissionPct').disabled = !unlocked;
+}
+
+function lock(){
+  unlocked = false;
+  myCode = null;
+  localStorage.removeItem(LOCAL_CODE_KEY);
+  document.getElementById('authBtn').classList.remove('unlocked');
+  document.getElementById('authBtnText').textContent = 'Войти как старший бариста';
+  renderAll();
+}
+function unlock(code){
+  unlocked = true;
+  myCode = code;
+  localStorage.setItem(LOCAL_CODE_KEY, code);
+  document.getElementById('authBtn').classList.add('unlocked');
+  document.getElementById('authBtnText').textContent = 'Вы вошли · выйти';
+  renderAll();
+}
+
+function wireAuth(){
+  const modal = document.getElementById('codeModal');
+  document.getElementById('authBtn').addEventListener('click', ()=>{
+    if(unlocked){ lock(); return; }
+    document.getElementById('codeInput').value = '';
+    modal.classList.add('active');
+    setTimeout(()=> document.getElementById('codeInput').focus(), 50);
+  });
+  document.getElementById('codeCancel').addEventListener('click', ()=> modal.classList.remove('active'));
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) modal.classList.remove('active'); });
+  document.getElementById('codeSubmit').addEventListener('click', async ()=>{
+    const code = document.getElementById('codeInput').value.trim();
+    if(!code) return;
+    modal.classList.remove('active');
+    unlock(code);
+    // validate by attempting a harmless save of current state
+    await persistNow();
+  });
+  document.getElementById('codeInput').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') document.getElementById('codeSubmit').click();
+  });
 }
 
 (async function init(){
-  await loadState();
+  wireAuth();
+  wireEmpAdd();
   wireSettings();
   wireRevCard();
+
+  const ok = await loadState();
+  if(!ok) return;
+
+  document.getElementById('loadNote').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+
+  const savedCode = localStorage.getItem(LOCAL_CODE_KEY);
+  if(savedCode){
+    unlocked = true;
+    myCode = savedCode;
+    document.getElementById('authBtn').classList.add('unlocked');
+    document.getElementById('authBtnText').textContent = 'Вы вошли · выйти';
+  }
   renderAll();
 })();
 </script>
