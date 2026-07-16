@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Зарплата бариста — интерактивно</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4f1; --card:#ffffff; --ink:#17140f; --muted:#726a5d; --faint:#a89f8f;
+    --line:#e2ddd3; --accent:#8a6a35; --accent-soft:#f0ebe0; --accent-deep:#5c4620;
+    --good:#5c6b52; --weekend:#f1efe9; --period-line:#cfc7b6; --danger:#8a3f30;
+    --shadow: none;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Manrope',sans-serif;line-height:1.55;padding:0 0 100px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 18px;}
+  a{color:inherit;}
+
+  header.top{padding:44px 18px 30px;text-align:center;border-bottom:1px solid var(--line);}
+  header.top h1{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(21px,3.6vw,27px);margin:0 0 8px;letter-spacing:.01em;}
+  header.top p{color:var(--muted);font-size:12.5px;margin:0 auto;max-width:440px;letter-spacing:.02em;text-transform:uppercase;}
+
+  .settings{display:flex;gap:16px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin:20px 0;align-items:center;}
+  .settings label{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px;letter-spacing:.01em;}
+  .settings input{width:88px;border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-size:13px;font-family:inherit;background:#fff;}
+  .settings input:focus{outline:none;border-color:var(--accent);}
+
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px;}
+  .stat-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;}
+  .stat-card .label{font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;}
+  .stat-card .value{font-family:'Fraunces',serif;font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 20px;margin-bottom:20px;}
+  .card h2{font-family:'Fraunces',serif;font-weight:500;font-size:15px;margin:0 0 4px;color:var(--ink);letter-spacing:.01em;}
+  .card .card-sub{font-size:11.5px;color:var(--muted);margin:0 0 16px;}
+  .scroll-x{overflow-x:auto;position:relative;}
+
+  table{border-collapse:collapse;width:100%;font-size:12.5px;white-space:nowrap;}
+  th,td{padding:7px 9px;text-align:center;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:700;font-size:10.5px;letter-spacing:.02em;text-transform:uppercase;}
+  .emp-name{text-align:left;font-weight:700;position:sticky;left:0;background:var(--card);z-index:2;}
+
+  .shift-cell{cursor:pointer;user-select:none;transition:background .15s;}
+  .shift-cell:hover{background:#f0ede4;}
+  .shift-yes{background:transparent;}
+  .shift-yes::after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+  .period-end{border-right:1px solid var(--period-line);}
+
+  .cell-input{width:74px;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-size:12.5px;text-align:center;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
+  .cell-input:focus{outline:none;border-color:var(--accent);}
+  .cell-input.overridden{border-color:var(--accent);background:var(--accent-soft);}
+  .cell-unit{font-size:10px;color:var(--faint);display:block;margin-top:1px;}
+  .reset-btn{border:none;background:none;color:var(--faint);cursor:pointer;font-size:11px;padding:2px;margin-left:2px;visibility:hidden;}
+  .cell-wrap{position:relative;display:inline-flex;align-items:center;gap:2px;}
+  .cell-wrap:hover .reset-btn.active{visibility:visible;}
+  .reset-btn.active{color:var(--accent);}
+
+  .rev-input{width:78px;border:1px solid var(--line);border-radius:5px;padding:5px 6px;font-size:12.5px;text-align:right;font-family:inherit;background:#fff;font-variant-numeric:tabular-nums;}
+  .weekend{background:var(--weekend);}
+  .readonly{color:var(--muted);}
+
+  .summary-table td{text-align:center;}
+  .summary-table td.emp-name{text-align:left;}
+  .summary-table .total-pay{font-weight:700;color:var(--ink);}
+
+  .legend{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:12px;flex-wrap:wrap;letter-spacing:.01em;}
+  .legend span{display:flex;align-items:center;gap:7px;}
+  .dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
+  .dot.yes{background:var(--accent);}
+  .dot.weekend{background:var(--faint);}
+  .dot.override{background:var(--accent);}
+
+  .saved{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:12px;padding:9px 18px;border-radius:6px;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:50;letter-spacing:.01em;}
+  .saved.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .saved.error{background:var(--danger);}
+
+  /* ---- mobile-only components ---- */
+  .mobile-only{display:none;}
+  .desktop-only{display:block;}
+
+  .emp-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--line);}
+  .emp-tab{border:none;background:none;color:var(--muted);padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:.02em;text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .emp-tab.active{color:var(--ink);border-bottom-color:var(--accent);}
+
+  .day-chip-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .day-chip{aspect-ratio:1;border-radius:4px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;font-variant-numeric:tabular-nums;}
+  .day-chip.worked{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .day-chip.period-mark{box-shadow:inset 0 0 0 1px var(--period-line);}
+
+  .rev-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px;}
+  .rev-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .rev-card-nav{display:flex;gap:8px;}
+  .rev-nav-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);}
+  .rev-card-date{font-family:'Fraunces',serif;font-size:17px;font-weight:500;text-align:center;}
+  .rev-card-weekday{text-align:center;font-size:11.5px;color:var(--muted);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase;}
+  .rev-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .rev-field label{font-size:11px;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase;}
+  .rev-field input{width:100%;padding:11px 6px;font-size:14px;border:1px solid var(--line);border-radius:6px;font-family:inherit;text-align:center;font-variant-numeric:tabular-nums;}
+  .rev-stats-row{display:flex;gap:10px;}
+  .rev-stat{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:11px;text-align:center;}
+  .rev-stat .l{font-size:10px;color:var(--muted);letter-spacing:.03em;text-transform:uppercase;}
+  .rev-stat .v{font-family:'Fraunces',serif;font-weight:500;font-size:15px;color:var(--ink);}
+  .rev-jump{display:flex;justify-content:center;margin-top:12px;}
+  .rev-jump select{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:12.5px;}
+
+  @media (max-width:720px){
+    .desktop-only{display:none !important;}
+    .mobile-only{display:block;}
+    .stats-row{grid-template-columns:1fr 1fr;}
+    .stats-row .stat-card:last-child{grid-column:span 2;}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Зарплата бариста</h1>
+  <p>30 июня — 31 июля · тыкай, пиши числа, всё считается и сохраняется само</p>
+</header>
+
+<div class="wrap">
+
+  <div class="settings">
+    <label>Ставка за смену <input type="number" id="ratePerShift" value="6000"> тг</label>
+    <label>Процент от кассы <input type="number" id="commissionPct" value="2" step="0.1"> %</label>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="label">Итого начислено</div><div class="value" id="grandTotal">—</div></div>
+    <div class="stat-card"><div class="label">Сотрудников</div><div class="value">4</div></div>
+    <div class="stat-card"><div class="label">Смен всего</div><div class="value" id="totalShifts">—</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Зарплата по периодам</h2>
+    <p class="card-sub">Любую ячейку можно переписать вручную — как формулу в экселе. Наведи и нажми ↺, чтобы вернуть авторасчёт.</p>
+    <div class="scroll-x">
+      <table class="summary-table" id="summaryTable"></table>
+    </div>
+  </div>
+
+  <div class="card desktop-only">
+    <h2>График смен</h2>
+    <p class="card-sub">Клик по клетке переключает смену</p>
+    <div class="scroll-x">
+      <table id="shiftTable"></table>
+    </div>
+    <div class="legend"><span><i class="dot yes"></i> рабочая смена</span></div>
+  </div>
+
+  <div class="card mobile-only">
+    <h2>График смен</h2>
+    <p class="card-sub">Выбери сотрудника, тапай по дням</p>
+    <div class="emp-tabs" id="empTabs"></div>
+    <div class="day-chip-grid" id="dayChipGrid"></div>
+    <div class="legend"><span><i class="dot yes"></i> рабочая смена</span></div>
+  </div>
+
+  <div class="card desktop-only">
+    <h2>Дневная выручка</h2>
+    <p class="card-sub">Редактируй бар/десерты — сумма и 2% посчитаются сами</p>
+    <div class="scroll-x">
+      <table id="revenueTable"></table>
+    </div>
+    <div class="legend"><span><i class="dot weekend"></i> выходной день</span></div>
+  </div>
+
+  <div class="card mobile-only">
+    <h2>Дневная выручка</h2>
+    <div class="rev-card">
+      <div class="rev-card-nav" style="justify-content:space-between;display:flex;margin-bottom:10px;">
+        <button class="rev-nav-btn" id="revPrev">←</button>
+        <button class="rev-nav-btn" id="revNext">→</button>
+      </div>
+      <div class="rev-card-date" id="revCardDate">—</div>
+      <div class="rev-card-weekday" id="revCardWeekday">—</div>
+      <div class="rev-fields">
+        <div class="rev-field"><label>Бар</label><input type="number" id="revCardBar"></div>
+        <div class="rev-field"><label>Десерты</label><input type="number" id="revCardDesserts"></div>
+      </div>
+      <div class="rev-stats-row">
+        <div class="rev-stat"><div class="l">Сумма</div><div class="v" id="revCardSum">—</div></div>
+        <div class="rev-stat"><div class="l">2% (касса)</div><div class="v" id="revCardKassa">—</div></div>
+      </div>
+      <div class="rev-jump"><select id="revJump"></select></div>
+    </div>
+  </div>
+
+</div>
+<div class="saved" id="savedToast">Сохранено</div>
+
+<script>
+const SEED = {"shifts": {"\u0415\u0440\u0430\u0441\u044b\u043b": {"2026-06-30": false, "2026-07-01": false, "2026-07-02": true, "2026-07-03": true, "2026-07-04": false, "2026-07-05": false, "2026-07-06": true, "2026-07-07": true, "2026-07-08": false, "2026-07-09": false, "2026-07-10": true, "2026-07-11": true, "2026-07-12": false, "2026-07-13": false, "2026-07-14": false, "2026-07-15": true, "2026-07-16": false, "2026-07-17": false, "2026-07-18": true, "2026-07-19": true, "2026-07-20": false, "2026-07-21": false, "2026-07-22": true, "2026-07-23": true, "2026-07-24": true, "2026-07-25": false, "2026-07-26": false, "2026-07-27": true, "2026-07-28": true, "2026-07-29": false, "2026-07-30": false}, "\u0411\u0435\u043a\u0430": {"2026-06-30": true, "2026-07-01": true, "2026-07-02": false, "2026-07-03": false, "2026-07-04": true, "2026-07-05": true, "2026-07-06": false, "2026-07-07": false, "2026-07-08": true, "2026-07-09": true, "2026-07-10": false, "2026-07-11": false, "2026-07-12": true, "2026-07-13": true, "2026-07-14": true, "2026-07-15": false, "2026-07-16": true, "2026-07-17": true, "2026-07-18": false, "2026-07-19": false, "2026-07-20": true, "2026-07-21": true, "2026-07-22": false, "2026-07-23": false, "2026-07-24": false, "2026-07-25": true, "2026-07-26": true, "2026-07-27": false, "2026-07-28": false, "2026-07-29": true, "2026-07-30": true}, "\u0414\u0430\u043c\u0438\u0440": {"2026-06-30": false, "2026-07-01": false, "2026-07-02": true, "2026-07-03": false, "2026-07-04": false, "2026-07-05": false, "2026-07-06": true, "2026-07-07": false, "2026-07-08": false, "2026-07-09": false, "2026-07-10": true, "2026-07-11": true, "2026-07-12": false, "2026-07-13": false, "2026-07-14": true, "2026-07-15": true, "2026-07-16": false, "2026-07-17": false, "2026-07-18": true, "2026-07-19": true, "2026-07-20": false, "2026-07-21": true, "2026-07-22": true, "2026-07-23": false, "2026-07-24": false, "2026-07-25": false, "2026-07-26": false, "2026-07-27": false, "2026-07-28": true, "2026-07-29": true, "2026-07-30": false}, "\u041a\u0435\u043c\u0430\u043b": {"2026-06-30": true, "2026-07-01": true, "2026-07-02": false, "2026-07-03": true, "2026-07-04": true, "2026-07-05": true, "2026-07-06": false, "2026-07-07": true, "2026-07-08": true, "2026-07-09": true, "2026-07-10": false, "2026-07-11": false, "2026-07-12": true, "2026-07-13": true, "2026-07-14": false, "2026-07-15": false, "2026-07-16": true, "2026-07-17": true, "2026-07-18": false, "2026-07-19": false, "2026-07-20": true, "2026-07-21": false, "2026-07-22": false, "2026-07-23": true, "2026-07-24": true, "2026-07-25": true, "2026-07-26": true, "2026-07-27": true, "2026-07-28": false, "2026-07-29": false, "2026-07-30": true}}, "revenue": {"2026-06-30": {"bar": 522280.0, "desserts": 98759.0}, "2026-07-01": {"bar": 478292.0, "desserts": 67627.0}, "2026-07-02": {"bar": 406703.0, "desserts": 61577.0}, "2026-07-03": {"bar": 479886.0, "desserts": 71426.0}, "2026-07-04": {"bar": 520028.0, "desserts": 95505.0}, "2026-07-05": {"bar": 518510.0, "desserts": 76611.0}, "2026-07-06": {"bar": 543528.0, "desserts": 95068.0}, "2026-07-07": {"bar": 454379.0, "desserts": 78742.0}, "2026-07-08": {"bar": 484155.0, "desserts": 66925.0}, "2026-07-09": {"bar": 486602.0, "desserts": 61947.0}, "2026-07-10": {"bar": 469938.0, "desserts": 69404.0}, "2026-07-11": {"bar": 600000.0, "desserts": 0.0}, "2026-07-12": {"bar": 0.0, "desserts": 0.0}, "2026-07-13": {"bar": 0.0, "desserts": 0.0}, "2026-07-14": {"bar": 0, "desserts": 0}, "2026-07-15": {"bar": 0.0, "desserts": 0.0}, "2026-07-16": {"bar": 0.0, "desserts": 0.0}, "2026-07-17": {"bar": 0.0, "desserts": 0.0}, "2026-07-18": {"bar": 0.0, "desserts": 0.0}, "2026-07-19": {"bar": 0.0, "desserts": 0.0}, "2026-07-20": {"bar": 0.0, "desserts": 0.0}, "2026-07-21": {"bar": 0.0, "desserts": 0.0}, "2026-07-22": {"bar": 0.0, "desserts": 0.0}, "2026-07-23": {"bar": 0.0, "desserts": 0.0}, "2026-07-24": {"bar": 0.0, "desserts": 0.0}, "2026-07-25": {"bar": 0.0, "desserts": 0.0}, "2026-07-26": {"bar": 0.0, "desserts": 0.0}, "2026-07-27": {"bar": 0.0, "desserts": 0.0}, "2026-07-28": {"bar": 0.0, "desserts": 0.0}, "2026-07-29": {"bar": 0.0, "desserts": 0.0}, "2026-07-30": {"bar": 0.0, "desserts": 0.0}, "2026-07-31": {"bar": 0.0, "desserts": 0.0}}}
+;
+const EMPLOYEES = ['Ерасыл','Бека','Дамир','Кемал'];
+const WEEKDAY_SHORT = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const STORAGE_KEY = 'payroll-data';
+
+function buildDates(){
+  const dates = [];
+  let d = new Date(2026,5,30);
+  const end = new Date(2026,6,31);
+  while(d <= end){
+    dates.push(d.toISOString().slice(0,10));
+    d = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1);
+  }
+  return dates;
+}
+const ALL_DATES = buildDates();
+const SHIFT_DATES = ALL_DATES.filter(d => d !== '2026-07-31');
+
+function periodOf(dateStr){
+  const day = parseInt(dateStr.slice(8,10),10);
+  const month = parseInt(dateStr.slice(5,7),10);
+  if(month===6) return 0;
+  if(day<=9) return 0;
+  if(day<=19) return 1;
+  return 2;
+}
+
+let state = {
+  shifts: {}, revenue: {},
+  settings: {ratePerShift:6000, commissionPct:2},
+  overrides: {}
+};
+let mobileEmp = EMPLOYEES[0];
+let mobileRevIndex = ALL_DATES.indexOf('2026-07-16');
+if(mobileRevIndex < 0) mobileRevIndex = 0;
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      state.shifts = parsed.shifts || SEED.shifts;
+      state.revenue = parsed.revenue || SEED.revenue;
+      state.settings = parsed.settings || state.settings;
+      state.overrides = parsed.overrides || {};
+      return;
+    }
+  }catch(e){ /* first run or read error, fall back to seed */ }
+  state.shifts = SEED.shifts;
+  state.revenue = SEED.revenue;
+}
+
+let saveTimer = null;
+let persistTimer = null;
+function showToast(msg, isError){
+  const t = document.getElementById('savedToast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=> t.classList.remove('show'), isError ? 2200 : 1000);
+}
+async function persistNow(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify({
+      shifts: state.shifts, revenue: state.revenue,
+      settings: state.settings, overrides: state.overrides
+    }));
+    showToast('Сохранено', false);
+  }catch(e){
+    console.error('save failed', e);
+    showToast('Не сохранилось — проверь связь, я попробую ещё раз', true);
+  }
+}
+function persist(){
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(persistNow, 500);
+}
+
+function fmtMoney(v){
+  if(v===null || v===undefined || isNaN(v)) return '—';
+  return Math.round(v*100)/100 + ' тг';
+}
+function fmtNum(v){
+  if(v===null || v===undefined || isNaN(v)) return '—';
+  return v.toLocaleString('ru-RU', {maximumFractionDigits:2});
+}
+
+function kassaDnya(dateStr){
+  const rev = state.revenue[dateStr] || {bar:0, desserts:0};
+  const total = (rev.bar||0) + (rev.desserts||0);
+  return total * (state.settings.commissionPct/100);
+}
+
+// auto (calendar-derived) values, always fresh, ignoring overrides
+function autoPeriods(emp){
+  const periods = [ {shifts:0, pay:0}, {shifts:0, pay:0}, {shifts:0, pay:0} ];
+  SHIFT_DATES.forEach(dateStr=>{
+    const worked = !!(state.shifts[emp] && state.shifts[emp][dateStr]);
+    if(worked){
+      const p = periodOf(dateStr);
+      periods[p].shifts += 1;
+      periods[p].pay += kassaDnya(dateStr) + state.settings.ratePerShift;
+    }
+  });
+  return periods;
+}
+
+function ov(emp){
+  if(!state.overrides[emp]) state.overrides[emp] = {};
+  return state.overrides[emp];
+}
+
+// field keys: s0,p0,s1,p1,s2,p2 (shifts/pay per period), stot,ptot
+function displayValue(emp, field, autoP){
+  const o = ov(emp);
+  if(o[field] !== undefined && o[field] !== null) return o[field];
+  const idx = {s0:0,p0:0,s1:1,p1:1,s2:2,p2:2}[field];
+  if(field[0]==='s') return autoP[idx].shifts;
+  return Math.round(autoP[idx].pay*100)/100;
+}
+function isOverridden(emp, field){
+  const o = ov(emp);
+  return o[field] !== undefined && o[field] !== null;
+}
+
+function totalsFor(emp, autoP){
+  const s0=displayValue(emp,'s0',autoP), s1=displayValue(emp,'s1',autoP), s2=displayValue(emp,'s2',autoP);
+  const p0=displayValue(emp,'p0',autoP), p1=displayValue(emp,'p1',autoP), p2=displayValue(emp,'p2',autoP);
+  const o = ov(emp);
+  const stot = (o.stot !== undefined && o.stot !== null) ? o.stot : (s0+s1+s2);
+  const ptot = (o.ptot !== undefined && o.ptot !== null) ? o.ptot : (Math.round((p0+p1+p2)*100)/100);
+  return {stot, ptot};
+}
+
+function makeCellHTML(emp, field, value, unit){
+  const overridden = isOverridden(emp, field);
+  return '<span class="cell-wrap">' +
+    '<input class="cell-input'+(overridden?' overridden':'')+'" type="number" data-emp="'+emp+'" data-field="'+field+'" value="'+value+'">' +
+    '<button class="reset-btn'+(overridden?' active':'')+'" data-emp="'+emp+'" data-field="'+field+'" title="Вернуть автоматический расчёт">↺</button>' +
+    '</span>';
+}
+
+function renderSummary(){
+  const table = document.getElementById('summaryTable');
+  let thead = '<thead><tr><th>Сотрудник</th><th>Смены 30-9</th><th>ЗП 30-9</th><th>Смены 10-19</th><th>ЗП 10-19</th><th>Смены 20-31</th><th>ЗП 20-31</th><th>Итого смен</th><th>Итого ЗП</th></tr></thead>';
+  let tbody = '<tbody>';
+  let grandTotal = 0, totalShiftsAll = 0;
+  EMPLOYEES.forEach(emp=>{
+    const autoP = autoPeriods(emp);
+    const s0=displayValue(emp,'s0',autoP), p0=displayValue(emp,'p0',autoP);
+    const s1=displayValue(emp,'s1',autoP), p1=displayValue(emp,'p1',autoP);
+    const s2=displayValue(emp,'s2',autoP), p2=displayValue(emp,'p2',autoP);
+    const {stot, ptot} = totalsFor(emp, autoP);
+    grandTotal += ptot; totalShiftsAll += stot;
+    tbody += '<tr>' +
+      '<td class="emp-name">'+emp+'</td>' +
+      '<td>'+makeCellHTML(emp,'s0',s0)+'</td>' +
+      '<td>'+makeCellHTML(emp,'p0',p0)+'</td>' +
+      '<td>'+makeCellHTML(emp,'s1',s1)+'</td>' +
+      '<td>'+makeCellHTML(emp,'p1',p1)+'</td>' +
+      '<td>'+makeCellHTML(emp,'s2',s2)+'</td>' +
+      '<td>'+makeCellHTML(emp,'p2',p2)+'</td>' +
+      '<td>'+makeCellHTML(emp,'stot',stot)+'</td>' +
+      '<td class="total-pay">'+makeCellHTML(emp,'ptot',ptot)+'</td>' +
+      '</tr>';
+  });
+  tbody += '</tbody>';
+  table.innerHTML = thead + tbody;
+  document.getElementById('grandTotal').textContent = fmtMoney(grandTotal);
+  document.getElementById('totalShifts').textContent = totalShiftsAll;
+
+  table.querySelectorAll('.cell-input').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const emp = inp.getAttribute('data-emp');
+      const field = inp.getAttribute('data-field');
+      const val = parseFloat(inp.value);
+      ov(emp)[field] = isNaN(val) ? null : val;
+      renderSummary();
+      persist();
+    });
+  });
+  table.querySelectorAll('.reset-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const emp = btn.getAttribute('data-emp');
+      const field = btn.getAttribute('data-field');
+      delete ov(emp)[field];
+      renderSummary();
+      persist();
+    });
+  });
+}
+
+function dayLabel(dateStr){
+  const day = parseInt(dateStr.slice(8,10),10);
+  const month = parseInt(dateStr.slice(5,7),10);
+  if(month===6) return '30/06';
+  return String(day);
+}
+function weekdayOf(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return WEEKDAY_SHORT[d.getDay()];
+}
+function isWeekend(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return d.getDay()===0 || d.getDay()===6;
+}
+
+function toggleShift(emp, dateStr){
+  if(!state.shifts[emp]) state.shifts[emp] = {};
+  state.shifts[emp][dateStr] = !state.shifts[emp][dateStr];
+}
+
+function renderShiftTableDesktop(){
+  const table = document.getElementById('shiftTable');
+  let thead = '<thead><tr><th class="emp-name">Сотрудник</th>';
+  SHIFT_DATES.forEach((dateStr,i)=>{
+    const nextDate = SHIFT_DATES[i+1] || '9999-99-99';
+    const cls = periodOf(dateStr) !== periodOf(nextDate) ? ' class="period-end"' : '';
+    thead += '<th'+cls+'>'+dayLabel(dateStr)+'</th>';
+  });
+  thead += '</tr></thead>';
+  let tbody = '<tbody>';
+  EMPLOYEES.forEach(emp=>{
+    tbody += '<tr><td class="emp-name">'+emp+'</td>';
+    SHIFT_DATES.forEach((dateStr,i)=>{
+      const worked = !!(state.shifts[emp] && state.shifts[emp][dateStr]);
+      const nextDate = SHIFT_DATES[i+1] || '9999-99-99';
+      const periodEnd = periodOf(dateStr) !== periodOf(nextDate);
+      tbody += '<td class="shift-cell '+(worked?'shift-yes':'')+(periodEnd?' period-end':'')+'" data-emp="'+emp+'" data-date="'+dateStr+'"></td>';
+    });
+    tbody += '</tr>';
+  });
+  tbody += '</tbody>';
+  table.innerHTML = thead + tbody;
+
+  table.querySelectorAll('.shift-cell').forEach(cell=>{
+    cell.addEventListener('click', ()=>{
+      const emp = cell.getAttribute('data-emp');
+      const dateStr = cell.getAttribute('data-date');
+      toggleShift(emp, dateStr);
+      cell.classList.toggle('shift-yes');
+      renderSummary();
+      persist();
+    });
+  });
+}
+
+function renderEmpTabs(){
+  const wrap = document.getElementById('empTabs');
+  wrap.innerHTML = '';
+  EMPLOYEES.forEach(emp=>{
+    const btn = document.createElement('button');
+    btn.className = 'emp-tab' + (emp===mobileEmp ? ' active' : '');
+    btn.textContent = emp;
+    btn.addEventListener('click', ()=>{ mobileEmp = emp; renderEmpTabs(); renderDayChips(); });
+    wrap.appendChild(btn);
+  });
+}
+
+function renderDayChips(){
+  const grid = document.getElementById('dayChipGrid');
+  grid.innerHTML = '';
+  SHIFT_DATES.forEach((dateStr,i)=>{
+    const worked = !!(state.shifts[mobileEmp] && state.shifts[mobileEmp][dateStr]);
+    const nextDate = SHIFT_DATES[i+1] || '9999-99-99';
+    const chip = document.createElement('div');
+    chip.className = 'day-chip' + (worked ? ' worked' : '') + (periodOf(dateStr)!==periodOf(nextDate) ? ' period-mark' : '');
+    chip.textContent = dayLabel(dateStr).replace('30/06','30.6');
+    chip.addEventListener('click', ()=>{
+      toggleShift(mobileEmp, dateStr);
+      chip.classList.toggle('worked');
+      renderSummary();
+      persist();
+    });
+    grid.appendChild(chip);
+  });
+}
+
+function renderRevenueTableDesktop(){
+  const table = document.getElementById('revenueTable');
+  let html = '<thead><tr><th>Дата</th><th>День</th><th>Бар</th><th>Десерты</th><th>Сумма</th><th>2% (касса)</th></tr></thead><tbody>';
+  ALL_DATES.forEach(dateStr=>{
+    const rev = state.revenue[dateStr] || {bar:0, desserts:0};
+    const total = (rev.bar||0)+(rev.desserts||0);
+    const kd = total * (state.settings.commissionPct/100);
+    const wcls = isWeekend(dateStr) ? ' class="weekend"' : '';
+    html += '<tr'+wcls+'>' +
+      '<td>'+dayLabel(dateStr)+'</td>' +
+      '<td>'+weekdayOf(dateStr)+'</td>' +
+      '<td><input class="rev-input" type="number" data-date="'+dateStr+'" data-field="bar" value="'+(rev.bar||0)+'"></td>' +
+      '<td><input class="rev-input" type="number" data-date="'+dateStr+'" data-field="desserts" value="'+(rev.desserts||0)+'"></td>' +
+      '<td class="readonly">'+fmtNum(total)+'</td>' +
+      '<td class="readonly">'+fmtMoney(kd)+'</td>' +
+      '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  table.querySelectorAll('.rev-input').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const dateStr = inp.getAttribute('data-date');
+      const field = inp.getAttribute('data-field');
+      if(!state.revenue[dateStr]) state.revenue[dateStr] = {bar:0, desserts:0};
+      state.revenue[dateStr][field] = parseFloat(inp.value) || 0;
+      renderRevenueTableDesktop();
+      renderRevCard();
+      renderSummary();
+      persist();
+    });
+  });
+}
+
+function renderRevJumpOptions(){
+  const sel = document.getElementById('revJump');
+  sel.innerHTML = ALL_DATES.map((d,i)=> '<option value="'+i+'">'+dayLabel(d)+' ('+weekdayOf(d)+')</option>').join('');
+  sel.value = mobileRevIndex;
+  sel.onchange = ()=>{ mobileRevIndex = parseInt(sel.value,10); renderRevCard(); };
+}
+
+function renderRevCard(){
+  const dateStr = ALL_DATES[mobileRevIndex];
+  const rev = state.revenue[dateStr] || {bar:0, desserts:0};
+  const total = (rev.bar||0)+(rev.desserts||0);
+  const kd = total * (state.settings.commissionPct/100);
+  document.getElementById('revCardDate').textContent = dayLabel(dateStr) + (dateStr.slice(5,7)==='07' && dateStr!=='2026-07-31' ? ' июля' : dateStr==='2026-07-31' ? ' июля' : ' июня');
+  document.getElementById('revCardWeekday').textContent = weekdayOf(dateStr) + (isWeekend(dateStr) ? ' · выходной' : '');
+  document.getElementById('revCardBar').value = rev.bar || 0;
+  document.getElementById('revCardDesserts').value = rev.desserts || 0;
+  document.getElementById('revCardSum').textContent = fmtNum(total);
+  document.getElementById('revCardKassa').textContent = fmtMoney(kd);
+  const sel = document.getElementById('revJump');
+  if(sel) sel.value = mobileRevIndex;
+}
+
+function wireRevCard(){
+  document.getElementById('revPrev').addEventListener('click', ()=>{
+    mobileRevIndex = Math.max(0, mobileRevIndex-1);
+    renderRevCard();
+  });
+  document.getElementById('revNext').addEventListener('click', ()=>{
+    mobileRevIndex = Math.min(ALL_DATES.length-1, mobileRevIndex+1);
+    renderRevCard();
+  });
+  ['revCardBar','revCardDesserts'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', ()=>{
+      const dateStr = ALL_DATES[mobileRevIndex];
+      if(!state.revenue[dateStr]) state.revenue[dateStr] = {bar:0, desserts:0};
+      const field = id==='revCardBar' ? 'bar' : 'desserts';
+      state.revenue[dateStr][field] = parseFloat(document.getElementById(id).value) || 0;
+      renderRevCard();
+      renderRevenueTableDesktop();
+      renderSummary();
+      persist();
+    });
+  });
+}
+
+function wireSettings(){
+  const rate = document.getElementById('ratePerShift');
+  const pct = document.getElementById('commissionPct');
+  rate.value = state.settings.ratePerShift;
+  pct.value = state.settings.commissionPct;
+  rate.addEventListener('change', ()=>{
+    state.settings.ratePerShift = parseFloat(rate.value) || 0;
+    renderAll();
+    persist();
+  });
+  pct.addEventListener('change', ()=>{
+    state.settings.commissionPct = parseFloat(pct.value) || 0;
+    renderAll();
+    persist();
+  });
+}
+
+function renderAll(){
+  renderSummary();
+  renderShiftTableDesktop();
+  renderEmpTabs();
+  renderDayChips();
+  renderRevenueTableDesktop();
+  renderRevJumpOptions();
+  renderRevCard();
+}
+
+(async function init(){
+  await loadState();
+  wireSettings();
+  wireRevCard();
+  renderAll();
+})();
+</script>
+</body>
+</html>
