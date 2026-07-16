@@ -242,7 +242,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwBW3dML1Q3QuH7G-jnXxhvTq4TpxLtakborldMbWVafHfc6wCPsdJ6EZZ6_uczX6idnw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXyBHD-bPwU-mwsqwOqjVuqGmQmktNgh_0FrBpyEcjjr7hTTmpL2RKLe88iHR6xvCyaw/exec';
 const WEEKDAY_SHORT = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const LOCAL_CODE_KEY = 'barista_access_code';
 
@@ -306,13 +306,18 @@ function showToast(msg, isError){
 async function persistNow(){
   if(!unlocked || !myCode) return;
   try{
-    const body = new URLSearchParams();
-    body.set('code', myCode);
-    body.set('data', JSON.stringify({
-      employees: state.employees, shifts: state.shifts, revenue: state.revenue,
-      settings: state.settings, overrides: state.overrides
-    }));
-    const res = await fetch(APPS_SCRIPT_URL, {method:'POST', body});
+    const payload = JSON.stringify({
+      code: myCode,
+      data: {
+        employees: state.employees, shifts: state.shifts, revenue: state.revenue,
+        settings: state.settings, overrides: state.overrides
+      }
+    });
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method:'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
+      body: payload
+    });
     const json = await res.json();
     if(json.error){
       showToast('Неверный код — вход сброшен', true);
