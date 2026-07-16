@@ -156,7 +156,7 @@
   <h1>Зарплата бариста</h1>
   <p>30 июня — 31 июля</p>
   <div class="auth-bar">
-    <button class="auth-btn" id="authBtn"><span class="auth-dot"></span><span id="authBtnText">Войти как старший бариста</span></button>
+    <button class="auth-btn" id="authBtn" style="display:none;"><span class="auth-dot"></span><span id="authBtnText">Сменить роль</span></button>
   </div>
 </header>
 
@@ -251,33 +251,45 @@
   </div>
 </div>
 
-<div class="load-note" id="loadNote">Загружаю данные…</div>
-
 <div class="saved" id="savedToast">Сохранено</div>
 
-<div class="modal-overlay" id="codeModal">
+<div class="modal-overlay active" id="codeModal">
   <div class="modal">
-    <h3>Вход для старшего бариста</h3>
-    <p>Код нужен только на этом устройстве один раз — дальше он запомнится в браузере.</p>
-    <input type="password" id="codeInput" placeholder="Код доступа">
-    <div class="modal-actions">
-      <button class="modal-btn cancel" id="codeCancel">Отмена</button>
-      <button class="modal-btn submit" id="codeSubmit">Войти</button>
+    <div id="roleStep">
+      <h3>Зарплата бариста</h3>
+      <p>Выбери, кто ты — от этого зависит, что будет доступно.</p>
+      <div class="modal-actions" style="flex-direction:column;gap:10px;">
+        <button class="modal-btn submit" id="roleBarista" style="width:100%;">Я бариста</button>
+        <button class="modal-btn cancel" id="roleSenior" style="width:100%;">Я старший бариста</button>
+      </div>
+    </div>
+    <div id="codeStep" style="display:none;">
+      <h3 id="codeStepTitle">Код доступа</h3>
+      <p id="codeStepHint">Код нужен только на этом устройстве один раз — дальше он запомнится в браузере.</p>
+      <input type="password" id="codeInput" placeholder="Код доступа">
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="codeBack">Назад</button>
+        <button class="modal-btn submit" id="codeSubmit">Войти</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyIkpzGhLzg2cM6FOfsqxQBR7leQs1d5CrISHUOSzoPWrveE2ojkq2Jz1EmVksb2QXkpw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzhyXBQpWI3xr7ITV8UL-Rbrg1yg98XVh_YAUey6F2xzv75tHdV5Gxos5STsiR3KDKlgA/exec';
 const WEEKDAY_SHORT = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const LOCAL_CODE_KEY = 'barista_access_code';
 
+function pad2(n){ return n < 10 ? '0'+n : ''+n; }
+function toISODateLocal(d){
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+}
 function buildDates(){
   const dates = [];
   let d = new Date(2026,5,30);
   const end = new Date(2026,6,31);
   while(d <= end){
-    dates.push(d.toISOString().slice(0,10));
+    dates.push(toISODateLocal(d));
     d = new Date(d.getFullYear(), d.getMonth(), d.getDate()+1);
   }
   return dates;
@@ -301,21 +313,18 @@ let mobileEmp = null;
 let mobileRevIndex = ALL_DATES.indexOf('2026-07-16');
 if(mobileRevIndex < 0) mobileRevIndex = 0;
 
-async function loadState(){
-  try{
-    const res = await fetch(APPS_SCRIPT_URL, {method:'GET'});
-    const json = await res.json();
-    state.employees = json.employees || [];
-    state.shifts = json.shifts || {};
-    state.revenue = json.revenue || {};
-    state.settings = json.settings || {ratePerShift:6000, commissionPct:2};
-    state.overrides = json.overrides || {};
-  }catch(e){
-    console.error('load failed', e);
-    document.getElementById('loadNote').textContent = 'Не получилось загрузить данные — проверь ссылку на скрипт и подключение к интернету.';
-    return false;
-  }
-  return true;
+async function loadState(code){
+  const res = await fetch(APPS_SCRIPT_URL + '?code=' + encodeURIComponent(code));
+  const json = await res.json();
+  if(json.error) return json;
+  state.employees = json.employees || [];
+  state.shifts = json.shifts || {};
+  state.revenue = json.revenue || {};
+  state.settings = json.settings || {ratePerShift:6000, commissionPct:2};
+  state.overrides = json.overrides || {};
+  unlocked = !!json.canEdit;
+  myCode = code;
+  return json;
 }
 
 let saveTimer = null;
@@ -347,7 +356,7 @@ async function persistNow(){
     const json = await res.json();
     if(json.error){
       showToast('Неверный код — вход сброшен', true);
-      lock();
+      logout();
       return;
     }
     showToast('Сохранено', false);
@@ -725,44 +734,72 @@ function renderAll(){
   document.getElementById('commissionPct').disabled = !unlocked;
 }
 
-function lock(){
+function logout(){
   unlocked = false;
   myCode = null;
   localStorage.removeItem(LOCAL_CODE_KEY);
-  document.getElementById('authBtn').classList.remove('unlocked');
-  document.getElementById('authBtnText').textContent = 'Войти как старший бариста';
-  renderAll();
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('authBtn').style.display = 'none';
+  showRoleStep();
+  document.getElementById('codeModal').classList.add('active');
 }
-function unlock(code){
-  unlocked = true;
-  myCode = code;
-  localStorage.setItem(LOCAL_CODE_KEY, code);
-  document.getElementById('authBtn').classList.add('unlocked');
-  document.getElementById('authBtnText').textContent = 'Вы вошли · выйти';
-  renderAll();
+
+function showRoleStep(){
+  document.getElementById('roleStep').style.display = 'block';
+  document.getElementById('codeStep').style.display = 'none';
+}
+function showCodeStep(role){
+  document.getElementById('roleStep').style.display = 'none';
+  document.getElementById('codeStep').style.display = 'block';
+  document.getElementById('codeStepTitle').textContent = role === 'senior' ? 'Код старшего бариста' : 'Код бариста';
+  document.getElementById('codeInput').value = '';
+  document.getElementById('codeInput').dataset.role = role;
+  setTimeout(()=> document.getElementById('codeInput').focus(), 50);
+}
+
+async function tryCode(code){
+  const submitBtn = document.getElementById('codeSubmit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Проверяю…';
+  try{
+    const json = await loadState(code);
+    if(json.error){
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Войти';
+      showToast('Неверный код', true);
+      return false;
+    }
+    localStorage.setItem(LOCAL_CODE_KEY, code);
+    document.getElementById('codeModal').classList.remove('active');
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('authBtn').style.display = 'inline-flex';
+    renderAll();
+    return true;
+  }catch(e){
+    console.error('load failed', e);
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Войти';
+    showToast('Не получилось подключиться — проверь интернет', true);
+    return false;
+  }
 }
 
 function wireAuth(){
-  const modal = document.getElementById('codeModal');
-  document.getElementById('authBtn').addEventListener('click', ()=>{
-    if(unlocked){ lock(); return; }
-    document.getElementById('codeInput').value = '';
-    modal.classList.add('active');
-    setTimeout(()=> document.getElementById('codeInput').focus(), 50);
-  });
-  document.getElementById('codeCancel').addEventListener('click', ()=> modal.classList.remove('active'));
-  modal.addEventListener('click', (e)=>{ if(e.target === modal) modal.classList.remove('active'); });
+  document.getElementById('roleBarista').addEventListener('click', ()=> showCodeStep('barista'));
+  document.getElementById('roleSenior').addEventListener('click', ()=> showCodeStep('senior'));
+  document.getElementById('codeBack').addEventListener('click', showRoleStep);
   document.getElementById('codeSubmit').addEventListener('click', async ()=>{
     const code = document.getElementById('codeInput').value.trim();
     if(!code) return;
-    modal.classList.remove('active');
-    unlock(code);
-    // validate by attempting a harmless save of current state
-    await persistNow();
+    const submitBtn = document.getElementById('codeSubmit');
+    await tryCode(code);
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Войти';
   });
   document.getElementById('codeInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') document.getElementById('codeSubmit').click();
   });
+  document.getElementById('authBtn').addEventListener('click', logout);
 }
 
 (async function init(){
@@ -771,20 +808,20 @@ function wireAuth(){
   wireSettings();
   wireRevCard();
 
-  const ok = await loadState();
-  if(!ok) return;
-
-  document.getElementById('loadNote').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
-
   const savedCode = localStorage.getItem(LOCAL_CODE_KEY);
   if(savedCode){
-    unlocked = true;
-    myCode = savedCode;
-    document.getElementById('authBtn').classList.add('unlocked');
-    document.getElementById('authBtnText').textContent = 'Вы вошли · выйти';
+    const json = await loadState(savedCode).catch(()=>({error:true}));
+    if(!json.error){
+      document.getElementById('codeModal').classList.remove('active');
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('authBtn').style.display = 'inline-flex';
+      renderAll();
+      return;
+    }
+    localStorage.removeItem(LOCAL_CODE_KEY);
   }
-  renderAll();
+  // no valid saved code — show the role/code gate, page stays hidden
+  showRoleStep();
 })();
 </script>
 </body>
